@@ -66,3 +66,6 @@ The program should take as input two or more drivers and a set of riders request
 1. Please do not access the internet for anything EXCEPT syntax. 
 1. You are free to use the language and IDE of your choice. 
 1. The entire code should be your own. 
+
+## Add-on Requirement
+- Design an `interface` or `interface class` to govern the booking system and can be exposed to the user.
