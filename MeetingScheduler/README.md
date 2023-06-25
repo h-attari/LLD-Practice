@@ -1,5 +1,6 @@
 # Meeting Scheduler
 
+## Problem Statement
 Design a meeting scheduler to book a meeting and return 
 
 the name of the room booked
@@ -10,3 +11,6 @@ Goals of the system
 - History of the meetings booked
 
 Write an API which accepts a start time and an end time, and returns the meeting room name for the booked scheduled time
+
+## Add-on Requirement
+- Schedule meetings for multiple days.
