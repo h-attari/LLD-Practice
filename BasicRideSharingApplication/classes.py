@@ -1,5 +1,5 @@
-from enum import Enum
 import uuid
+from enum import Enum
 
 
 class RideStatus(Enum):
@@ -15,14 +15,16 @@ class Person:
 
 
 class Ride:
-    def __init__(self, origin: int, destination: int, seats: int, amount_per_km: int=20) -> None:
+    def __init__(
+        self, origin: int, destination: int, seats: int, amount_per_km: int = 20
+    ) -> None:
         self.id = uuid.uuid4()
         self.origin = origin
         self.destination = destination
         self.seats = seats
         self.amount_per_km = amount_per_km
         self.status = RideStatus.open
-    
+
     def calculate_amount(self) -> int:
         km = self.destination - self.origin
         amount = km * self.seats * self.amount_per_km
@@ -36,7 +38,7 @@ class Driver(Person):
         self.id = f"d-{uuid.uuid4()}"
         self.rider = None
         Person.__init__(self, name)
-    
+
     def close_ride(self) -> int:
         ride = self.ride
         ride_amount = ride.calculate_amount()
@@ -52,8 +54,10 @@ class Rider(Person):
         self.id = f"d-{uuid.uuid4()}"
         self.driver = None
         Person.__init__(self, name)
-    
-    def create_ride(self, origin: int, destination: int, seats: int, driver: Driver) -> None:
+
+    def create_ride(
+        self, origin: int, destination: int, seats: int, driver: Driver
+    ) -> None:
         if self.ride is not None:
             raise Exception("Only 1 ride at a time is allowed.")
         ride = Ride(origin, destination, seats)
@@ -62,8 +66,10 @@ class Rider(Person):
         driver.rider = self
         self.driver = driver
         print(f"Ride created with id: {ride.id}")
-    
-    def update_ride(self, origin: int, destination: int, seats: int, driver: Driver) -> None:
+
+    def update_ride(
+        self, origin: int, destination: int, seats: int, driver: Driver
+    ) -> None:
         if self.ride is None:
             print("No present ride, creating a new ride.")
             self.create_ride(origin, destination, seats, driver)
@@ -73,7 +79,7 @@ class Rider(Person):
             ride.destination = destination
             ride.seats = seats
             print(f"Ride updated with id: {ride.id}")
-    
+
     def withdraw_ride(self) -> None:
         self.ride.status = RideStatus.withdrawn
         self.ride = None
