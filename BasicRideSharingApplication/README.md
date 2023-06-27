@@ -27,9 +27,9 @@ The program should take as input two or more drivers and a set of riders request
     OUTPUT: Ride Amount: 10 \* 20 (Amount/Km) = 200 
 
 
-    B requesting for ride R1 
+    A requesting for ride R1 
 
-    INPUT: B requests 50, 60, 2,  
+    INPUT: A requests 50, 60, 2,  
 
     OUTPUT: Ride Amount: 10 \* 2 \* 0.75 \* 20 (Amount/Km)  = 300 
 
