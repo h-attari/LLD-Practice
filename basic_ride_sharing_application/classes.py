@@ -1,14 +1,23 @@
+"""
+Module contains design logic for the LLD problem.
+"""
 import uuid
 from enum import Enum
 
 
 class RideStatus(Enum):
-    open = 1
-    closed = 2
-    withdrawn = 3
+    """
+    Enum class to assign ride statuses.
+    """
+    OPEN = 1
+    CLOSED = 2
+    WITHDRAWN = 3
 
 
 class Person:
+    """
+    Parent class for Riders and Drivers.
+    """
     def __init__(self, name: str) -> None:
         self.name = name
         self.ride = None
@@ -16,14 +25,20 @@ class Person:
 
 
 class Driver(Person):
+    """
+    Class to accommodate Driver related attributes.
+    """
     def __init__(self, name: str) -> None:
-        self.id = f"d-{uuid.uuid4()}"
+        self.driver_id = f"d-{uuid.uuid4()}"
         self.rider = None
         Person.__init__(self, name)
 
     def close_ride(self) -> int:
+        """
+        Method used by driver instance to close and mark the current ride as completed.
+        """
         ride = self.ride
-        ride.status = RideStatus.closed
+        ride.status = RideStatus.CLOSED
         self.ride = None
         self.rider.ride = None
         self.rider.rides_count += 1
@@ -34,30 +49,43 @@ class Driver(Person):
 
 
 class Rider(Person):
+    """
+    Class to accommodate Rider related attributes.
+    """
     def __init__(self, name: str) -> None:
-        self.id = f"d-{uuid.uuid4()}"
+        self.rider_id = f"d-{uuid.uuid4()}"
         self.driver = None
         self.preferred_rider = False
         Person.__init__(self, name)
 
     def upgrade_rider(self):
+        """
+        Method to mark a rider as premium after a certain condition fulfilled
+        """
         self.preferred_rider = True
 
     def create_ride(
         self, origin: int, destination: int, seats: int, driver: Driver
     ) -> None:
+        """
+        Method used by rider instance to initiate a new ride.
+        """
         if self.ride is not None:
-            raise Exception("Only 1 ride at a time is allowed.")
+            raise ValueError("Only 1 ride at a time is allowed.")
         ride = Ride(origin, destination, seats)
         self.ride = ride
         driver.ride = ride
         driver.rider = self
         self.driver = driver
-        print(f"Ride created with id: {ride.id}")
+        print(f"Ride created with id: {ride.ride_id}")
 
     def update_ride(
         self, origin: int, destination: int, seats: int, driver: Driver
     ) -> None:
+        """
+        Method used by rider instance to update the current ride if present
+        else initiate a new ride.
+        """
         if self.ride is None:
             print("No present ride, creating a new ride.")
             self.create_ride(origin, destination, seats, driver)
@@ -66,30 +94,39 @@ class Rider(Person):
             ride.origin = origin
             ride.destination = destination
             ride.seats = seats
-            print(f"Ride updated with id: {ride.id}")
+            print(f"Ride updated with id: {ride.ride_id}")
 
     def withdraw_ride(self) -> None:
-        self.ride.status = RideStatus.withdrawn
+        """
+        Method used by rider instance to cancel the current ride.
+        """
+        self.ride.status = RideStatus.WITHDRAWN
         self.ride = None
         self.driver.ride = None
 
 
 class Ride:
+    """
+    Class to accommodate Ride related attributes.
+    """
     def __init__(
         self, origin: int, destination: int, seats: int, amount_per_km: int = 20
     ) -> None:
-        self.id = uuid.uuid4()
+        self.ride_id = uuid.uuid4()
         self.origin = origin
         self.destination = destination
         self.seats = seats
         self.amount_per_km = amount_per_km
-        self.status = RideStatus.open
+        self.status = RideStatus.OPEN
 
     def calculate_amount(self, rider: Rider) -> int:
-        km = self.destination - self.origin
+        """
+        Method to calculate the total ride fare at the time of ride completion.
+        """
+        km_travelled = self.destination - self.origin
         if rider.preferred_rider:
             discount_mutiplier = 0.5 if self.seats > 1 else 0.75
         else:
             discount_mutiplier = 0.75 if self.seats > 1 else 1
-        amount = km * self.seats * self.amount_per_km * discount_mutiplier
+        amount = km_travelled * self.seats * self.amount_per_km * discount_mutiplier
         return round(amount)
