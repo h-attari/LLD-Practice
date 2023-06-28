@@ -36,10 +36,7 @@ The program should take as input two or more drivers and a set of riders request
 ## Bonus: 
 
 - Upgrade the rider to a preferred rider if he has done in more than 10 rides.  
-- Preferred Rider amount if No of seats >= 2 :  No of kilometers \* No of seats \* 0.5 \* Amount 
-
-## Charged per KM  
-
+- Preferred Rider amount if No of seats >= 2 :  No of kilometers \* No of seats \* 0.5 \* Amount
 - Preferred Ride amount if No of seats = 1 :  No of kilometers \* Amount Charged per KM \* 0.75 
 
 ## Functionalities expected: 
