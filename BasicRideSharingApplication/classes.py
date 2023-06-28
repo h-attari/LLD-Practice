@@ -39,7 +39,7 @@ class Rider(Person):
         self.driver = None
         self.preferred_rider = False
         Person.__init__(self, name)
-    
+
     def upgrade_rider(self):
         self.preferred_rider = True
 
