@@ -24,7 +24,35 @@ class Person:
         self.rides_count = 0
 
 
-class Driver(Person):
+class Ride:
+    """
+    Class to accommodate Ride related attributes.
+    """
+    def __init__(
+        self, origin: int, destination: int, seats: int, premium_ride: bool = False, amount_per_km: int = 20
+    ) -> None:
+        self.ride_id = uuid.uuid4()
+        self.origin = origin
+        self.destination = destination
+        self.seats = seats
+        self.amount_per_km = amount_per_km
+        self.status = RideStatus.OPEN
+        self._premium = premium_ride
+
+    def _calculate_amount(self) -> int:
+        """
+        Method to calculate the total ride fare at the time of ride completion.
+        """
+        km_travelled = self.destination - self.origin
+        if self._premium:
+            discount_mutiplier = 0.5 if self.seats > 1 else 0.75
+        else:
+            discount_mutiplier = 0.75 if self.seats > 1 else 1
+        amount = km_travelled * self.seats * self.amount_per_km * discount_mutiplier
+        return round(amount)
+
+
+class Driver(Person, Ride):
     """
     Class to accommodate Driver related attributes.
     """
@@ -39,16 +67,16 @@ class Driver(Person):
         """
         ride = self.ride
         ride.status = RideStatus.CLOSED
-        self.ride = None
-        self.rider.ride = None
         self.rider.rides_count += 1
         if not self.rider.preferred_rider and self.rider.rides_count > 10:
             self.rider.upgrade_rider()
-        ride_amount = ride.calculate_amount(self.rider)
+        ride_amount = ride._calculate_amount()
+        self.ride = None
+        self.rider.ride = None
         return ride_amount
 
 
-class Rider(Person):
+class Rider(Person, Ride):
     """
     Class to accommodate Rider related attributes.
     """
@@ -63,6 +91,7 @@ class Rider(Person):
         Method to mark a rider as premium after a certain condition fulfilled
         """
         self.preferred_rider = True
+        self.ride._premium = True
 
     def create_ride(
         self, origin: int, destination: int, seats: int, driver: Driver
@@ -72,7 +101,8 @@ class Rider(Person):
         """
         if self.ride is not None:
             raise ValueError("Only 1 ride at a time is allowed.")
-        ride = Ride(origin, destination, seats)
+        premium_ride = True if self.preferred_rider else False
+        ride = Ride(origin, destination, seats, premium_ride)
         self.ride = ride
         driver.ride = ride
         driver.rider = self
@@ -103,30 +133,3 @@ class Rider(Person):
         self.ride.status = RideStatus.WITHDRAWN
         self.ride = None
         self.driver.ride = None
-
-
-class Ride:
-    """
-    Class to accommodate Ride related attributes.
-    """
-    def __init__(
-        self, origin: int, destination: int, seats: int, amount_per_km: int = 20
-    ) -> None:
-        self.ride_id = uuid.uuid4()
-        self.origin = origin
-        self.destination = destination
-        self.seats = seats
-        self.amount_per_km = amount_per_km
-        self.status = RideStatus.OPEN
-
-    def calculate_amount(self, rider: Rider) -> int:
-        """
-        Method to calculate the total ride fare at the time of ride completion.
-        """
-        km_travelled = self.destination - self.origin
-        if rider.preferred_rider:
-            discount_mutiplier = 0.5 if self.seats > 1 else 0.75
-        else:
-            discount_mutiplier = 0.75 if self.seats > 1 else 1
-        amount = km_travelled * self.seats * self.amount_per_km * discount_mutiplier
-        return round(amount)
