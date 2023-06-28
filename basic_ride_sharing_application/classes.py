@@ -9,6 +9,7 @@ class RideStatus(Enum):
     """
     Enum class to assign ride statuses.
     """
+
     OPEN = 1
     CLOSED = 2
     WITHDRAWN = 3
@@ -18,6 +19,7 @@ class Person:
     """
     Parent class for Riders and Drivers.
     """
+
     def __init__(self, name: str) -> None:
         self.name = name
         self.ride = None
@@ -28,8 +30,14 @@ class Ride:
     """
     Class to accommodate Ride related attributes.
     """
+
     def __init__(
-        self, origin: int, destination: int, seats: int, premium_ride: bool = False, amount_per_km: int = 20
+        self,
+        origin: int,
+        destination: int,
+        seats: int,
+        premium_ride: bool = False,
+        amount_per_km: int = 20,
     ) -> None:
         self.ride_id = uuid.uuid4()
         self.origin = origin
@@ -56,6 +64,7 @@ class Driver(Person, Ride):
     """
     Class to accommodate Driver related attributes.
     """
+
     def __init__(self, name: str) -> None:
         self.driver_id = f"d-{uuid.uuid4()}"
         self.rider = None
@@ -80,6 +89,7 @@ class Rider(Person, Ride):
     """
     Class to accommodate Rider related attributes.
     """
+
     def __init__(self, name: str) -> None:
         self.rider_id = f"d-{uuid.uuid4()}"
         self.driver = None
