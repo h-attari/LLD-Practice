@@ -12,25 +12,7 @@ class Person:
     def __init__(self, name: str) -> None:
         self.name = name
         self.ride = None
-
-
-class Ride:
-    def __init__(
-        self, origin: int, destination: int, seats: int, amount_per_km: int = 20
-    ) -> None:
-        self.id = uuid.uuid4()
-        self.origin = origin
-        self.destination = destination
-        self.seats = seats
-        self.amount_per_km = amount_per_km
-        self.status = RideStatus.open
-
-    def calculate_amount(self) -> int:
-        km = self.destination - self.origin
-        amount = km * self.seats * self.amount_per_km
-        if self.seats > 1:
-            amount *= 0.75
-        return int(amount)
+        self.rides_count = 0
 
 
 class Driver(Person):
@@ -41,11 +23,13 @@ class Driver(Person):
 
     def close_ride(self) -> int:
         ride = self.ride
-        ride_amount = ride.calculate_amount()
-        ride.closed = True
+        ride.status = RideStatus.closed
         self.ride = None
         self.rider.ride = None
-        ride.status = RideStatus.closed
+        self.rider.rides_count += 1
+        if not self.rider.preferred_rider and self.rider.rides_count > 10:
+            self.rider.upgrade_rider()
+        ride_amount = ride.calculate_amount(self.rider)
         return ride_amount
 
 
@@ -53,7 +37,11 @@ class Rider(Person):
     def __init__(self, name: str) -> None:
         self.id = f"d-{uuid.uuid4()}"
         self.driver = None
+        self.preferred_rider = False
         Person.__init__(self, name)
+    
+    def upgrade_rider(self):
+        self.preferred_rider = True
 
     def create_ride(
         self, origin: int, destination: int, seats: int, driver: Driver
@@ -84,3 +72,24 @@ class Rider(Person):
         self.ride.status = RideStatus.withdrawn
         self.ride = None
         self.driver.ride = None
+
+
+class Ride:
+    def __init__(
+        self, origin: int, destination: int, seats: int, amount_per_km: int = 20
+    ) -> None:
+        self.id = uuid.uuid4()
+        self.origin = origin
+        self.destination = destination
+        self.seats = seats
+        self.amount_per_km = amount_per_km
+        self.status = RideStatus.open
+
+    def calculate_amount(self, rider: Rider) -> int:
+        km = self.destination - self.origin
+        if rider.preferred_rider:
+            discount_mutiplier = 0.5 if self.seats > 1 else 0.75
+        else:
+            discount_mutiplier = 0.75 if self.seats > 1 else 1
+        amount = km * self.seats * self.amount_per_km * discount_mutiplier
+        return round(amount)
